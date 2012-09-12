@@ -576,19 +576,21 @@ class ReviewBoardServer(object):
                 'status': 'pending',
             })
 
-    def close_submitted(self, review_request):
+    def close_submitted(self, review_request, comment_text=None):
         """
-        Close a review request as submitted (with no reason).
-        
+        Close a review request as submitted (with optional reason).
         """
         debug("Closing as submitted")
 
         if self.deprecated_api:
             raise NotImplementedError()
         else:
-            self.api_put(review_request['links']['self']['href'], {
+            payload = {
                 'status': 'submitted',
-            })
+            }
+            if comment_text:
+                payload['description'] = comment_text
+            self.api_put(review_request['links']['self']['href'], payload)
 
     def add_comment(self, review_request, comment_text):
         """
@@ -872,6 +874,7 @@ def debug(s):
     if options and options.debug:
         print ">>> %s" % s
 
+
 def comment_or_close(server):
     """
     Add a comment and/or close as submitted
@@ -886,7 +889,7 @@ def comment_or_close(server):
             server.add_comment(review_request, options.comment)
 
         if options.close_submitted:
-            server.close_submitted(review_request)
+            server.close_submitted(review_request, options.comment)
     except APIError, e:
         die("Error updating review request %s: %s" % (options.rid, e))
 
@@ -1207,7 +1210,7 @@ def parse_options(args):
                       dest="comment_file", default=None,
                       help="file containing test of a free-standing comment ")
     parser.add_option("--close-submitted",
-                      dest="close_submitted",action="store_true",default=False,
+                      dest="close_submitted", action="store_true", default=False,
                       help="close review as submitted")
 
 
@@ -1315,7 +1318,7 @@ def main():
          or options.guess_summary or options.guess_description or options.testing_done \
          or options.testing_file or options.branch or options.bugs_closed \
          or options.revision_range or options.submit_as \
-         or options.diff_filename ):
+         or options.diff_filename):
         sys.stderr.write("The --close-submitted option is only valid when not "
                          "changing other fields in the Review Request.\n")
         sys.exit(1)
