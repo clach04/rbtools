@@ -31,7 +31,7 @@
 #
 #   (Major, Minor, Micro, alpha/beta/rc/final, Release Number, Released)
 #
-VERSION = (0, 4, 1, 'final', 0, True)
+VERSION = (0, 4, 1, 'alpha', 0, True)  # rewinding clock due to missing p2 features
 
 
 def get_version_string():
