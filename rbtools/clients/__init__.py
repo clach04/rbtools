@@ -140,6 +140,33 @@ def load_scmclients(options):
         SVNClient(options=options),
     ]
 
+####################################################################
+# Piccolo version - less clients
+# re-define load_scmclients()/SCMCLIENTS
+# re-defining load_scmclients() (rather than modifiying)
+# makes merging changes easier (than customizing SCMCLIENTS) :-)
+
+
+def load_scmclients(options):
+    global SCMCLIENTS
+
+    from rbtools.clients.svn import SVNClient
+    from rbtools.clients.piccolo import PiccoloClient
+
+    # Only populate with SCM Client that will not fail
+    # for example due to missing fork support under VMS
+    SCMCLIENTS = [
+        PiccoloClient(options=options),
+    ]
+    tmp_platform = sys.platform
+    if 'java' in tmp_platform.lower():
+        jv_props = sys.getBaseProperties()
+        tmp_platform = jv_props['os.name']
+    if tmp_platform != 'OpenVMS':
+        # i.e. platform (probably) supports subprocess and/or fork
+        SCMCLIENTS.insert(0, SVNClient(options=options))
+####################################################################
+
 
 def scan_usable_client(options):
     from rbtools.clients.perforce import PerforceClient
