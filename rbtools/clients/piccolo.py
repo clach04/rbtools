@@ -12,10 +12,10 @@ from rbtools.utils.process import execute, die
 
 
 # Debugging.  For development...
-DEBUG           = False
-#DEBUG           = True  # required as --debug flag doesn't log everything, somethings occur before arg parsing
+DEBUG = False
+#DEBUG = True  # required as --debug flag doesn't log everything, somethings occur before arg parsing
 
-#DEBUG = True  ## FIXME debug remove!
+
 def my_setup_debug():
     if DEBUG:
         LOG_FILENAME = '/tmp/logging_example.out'
@@ -61,7 +61,7 @@ class PiccoloClient(SCMClient):
         self.p_minver = (2, 2, 9)
         self.p_minver = (2, 3, 5)  # adds the '-i' flag to rcompare integrated files as needed for review.
         self.p_minver = list(self.p_minver)
-        self.p_minver_str = '.'.join(map(str,self.p_minver))
+        self.p_minver_str = '.'.join(map(str, self.p_minver))
         self.p_bin = self.options.p2_binary or 'p'
         """
         # self.options.debug not populated yet
@@ -79,20 +79,20 @@ class PiccoloClient(SCMClient):
             self.p_actualver = map(int, self.p_actualver.split('.'))
         if self.options.p2changenumber or os.environ.get('ENABLE_POSTREVIEWPICCOLOCLIENT'):
             # User requested Piccolo support in postreview be enabled without check
-            perform_piccolo_check=False
+            perform_piccolo_check = False
             logging.debug("not going to perform piccolo check")
         else:
             logging.debug('diff_filename %r', self.options.diff_filename)
             if self.options.diff_filename:
-                perform_piccolo_check=False
+                perform_piccolo_check = False
             else:
-                perform_piccolo_check=True
+                perform_piccolo_check = True
             
         try:
             # Jython only test, consider using a robust check platform module, http://downloads.egenix.com/python/platform.py I think there are others
-            os_plat=os.get_os_type()
+            os_plat = os.get_os_type()
         except AttributeError:
-            os_plat=''
+            os_plat = ''
         if sys.platform.startswith('win') or os_plat == 'nt':
             self._command_args = ['cmd', '/C']
         else:
@@ -102,7 +102,7 @@ class PiccoloClient(SCMClient):
         logging.debug("piccolo bin %r" % self.p_bin)
         if perform_piccolo_check:
             logging.debug("about to check for piccolo")
-            if not check_install('%s help' % self.p_bin): # or "p here"? ideally 'p version -c' and then report issues with version (-c option was added to version 2.2.0 of piccolo; p2main.c -> 66 Change 2041 -> 66 (change) on 14-oct-2008 by whiro01)
+            if not check_install('%s help' % self.p_bin):  # or "p here"? ideally 'p version -c' and then report issues with version (-c option was added to version 2.2.0 of piccolo; p2main.c -> 66 Change 2041 -> 66 (change) on 14-oct-2008 by whiro01)
                 # "p version -c" does not require current directory to be in MAPPATH (does not even need MAPPATH set)
                 # p help needs mappath (and connection to server)
                 logging.debug("piccolo check check_install() failed")
@@ -110,7 +110,7 @@ class PiccoloClient(SCMClient):
             # so we have a piccolo command in the path
             if not self.p_actualver:
                 # check version of piccolo client .........
-                pic_command_str = '%s version -c'  % self.p_bin
+                pic_command_str = '%s version -c' % self.p_bin
                 pver_text = execute(self._command_args + [pic_command_str], ignore_errors=True, extra_ignore_errors=(1,))
                 logging.info('pver_text %r', pver_text)
                 if pver_text.startswith('Invalid option:'):
@@ -157,7 +157,7 @@ class PiccoloClient(SCMClient):
             if sys.platform.startswith('win') or os_plat == 'nt':
                 check_gnu_diff()
         else:
-            self._p_here_txt = 'EDITME_P2_CLIENT_INFO'  ## TODO do at least minimum hostname and pwd?
+            self._p_here_txt = 'EDITME_P2_CLIENT_INFO'  # TODO do at least minimum hostname and pwd?
         logging.debug('self._p_here_txt %r', self._p_here_txt)
         
         if self.options.submit_as is None:
@@ -191,8 +191,8 @@ class PiccoloClient(SCMClient):
         if self.options.server is None:
             self.options.server = 'http://reviewboard.ingres.prv'  # should consider overridding _get_server_from_config()
         
-        print 'DEBUG clach04', repository_path
-        print 'DEBUG clach04', self.options.server
+        logging.debug('repository_path %r', repository_path)
+        logging.debug('options.server %r', self.options.server)
         return RepositoryInfo(path=repository_path, supports_changesets=False)
         
     def _p_rcompare_diff(self, files):
@@ -222,8 +222,9 @@ class PiccoloClient(SCMClient):
 
                 post-review  --server=http://reviewboard.ingres.prv --summary="This is a post-review test by hanal04" --description="Checking current automatic field entry from the command line." --bugs-closed="123456, 98734" --target-groups="admin grp" --target-people="clach04" --submit-as="hanal04 -r 999999"
             """
-            diffbytes=open(self.options.diff_filename, 'r').read() ## TODO consider strings instead of bytes? NOTE not using binary as we want to avoid \r values.... This may need further work, this is mostly for win32
-            diff_text=diffbytes
+            # FIXME file handle leak in non CPython implementions due to missing file.close()
+            diffbytes = open(self.options.diff_filename, 'r').read()  # TODO consider strings instead of bytes? NOTE not using binary as we want to avoid \r values.... This may need further work, this is mostly for win32
+            diff_text = diffbytes
         else:
             if self.options.piccolo_flist:
                 if self.options.piccolo_flist.strip() == '-':
@@ -252,7 +253,7 @@ These files need integrating:
             # TODO do we need to redirect and capture stderr? "2>&1".
             if self.options.piccolo_flist:
                 self.options.piccolo_flist = os.path.abspath(self.options.piccolo_flist)
-                working_params = '-l %s ' % self.options.piccolo_flist # TODO do we need to escape the filepath?
+                working_params = '-l %s ' % self.options.piccolo_flist  # TODO do we need to escape the filepath?
             else:
                 if files:
                     # Just the names specified on command line (and in current directory as Piccolo paths do not match native paths)
@@ -272,7 +273,7 @@ These files need integrating:
             pic_command_str = '%s working %s | %s rcompare %s -l -' % (self.p_bin, working_params, self.p_bin, pflag_sane_integration_diffs)  # remove "-s", DEBUG TEST. -s flag to rcompare freaks piccolo out if file is being added
             # be nice if piccolo rcompare supported a new param -working (or similar)
             
-            diff_text=execute(self._command_args + [pic_command_str], extra_ignore_errors=(1,))
+            diff_text = execute(self._command_args + [pic_command_str], extra_ignore_errors=(1,))
             # Could add extra sanity check; for decent looking output, e.g. starts with '==='
         return (diff_text, None)
     
@@ -352,7 +353,7 @@ These files need integrating:
 
         # Only overide if not specifed on command line? TODO decided if we always clobber!
         if not self.options.summary:
-            self.options.summary = change_text[3] # 2nd line from of p describe -s descript 493916, etc
+            self.options.summary = change_text[3]  # 2nd line from of p describe -s descript 493916, etc
             # clean leading chars 
             self.options.summary = self.options.summary[len('   V  '):]
         if not self.options.description:
@@ -360,14 +361,14 @@ These files need integrating:
             p2_existing_change_warning_line = '-' * 65 + '\n\n'
             p2_existing_change_warning = 'WARNING files that were ADDED have been stripped out\n\n'
             
-            self.options.description = '\n'.join(change_text[description_start_line+2:diff_start_line-1])  # output from p describe -s descript 493916 + p describe -s relnotes 493916
+            self.options.description = '\n'.join(change_text[description_start_line + 2:diff_start_line - 1])  # output from p describe -s descript 493916 + p describe -s relnotes 493916
             self.options.description = p2_existing_change_warning + p2_existing_change_warning_line + self.options.description + '\n' + p2_existing_change_warning_line + p2_existing_change_warning
         
         difftextlist = []
         file_addition = False
         skip_file_additions = False
         #skip_file_additions = True  # FIXME debug it does work, just not ready for prime time yet
-        for line in change_text[diff_start_line+2:]:
+        for line in change_text[diff_start_line + 2:]:
             if line:
                 if file_addition and skip_file_additions:
                     # really dumb "is this a new file header" check,
@@ -389,7 +390,7 @@ These files need integrating:
                     except ValueError:
                         # crappy file name extraction
                         pictree, picfilename, dummy1, dummy2, dummy3, picrev = line.split()  # for file additions
-                        picrev = picrev[:-1] #  lose trailing period
+                        picrev = picrev[:-1]  # lose trailing period
                         logging.debug('in except %r', (pictree, picfilename, int(picrev)))
                         file_addition = True
                     if file_addition:
@@ -401,7 +402,7 @@ These files need integrating:
 
                     assert '!' in pictree
                     if not file_addition:
-                        difftextlist.append('=== %s %s rev %d ====' % (pictree, picfilename, int(picrev)-1))
+                        difftextlist.append('=== %s %s rev %d ====' % (pictree, picfilename, int(picrev) - 1))
         
         if skip_file_additions:
             # DEBUG reset
@@ -430,23 +431,23 @@ These files need integrating:
         Either checks all (default) or uses the path of (only) the first file in the diff
         """
         rawstr = r"""^=== (\S*) (\S*) rev (\d+) ====$"""
-        compile_obj = re.compile(rawstr,  re.MULTILINE)
-        STOP_ON_FIRST=True
-        STOP_ON_FIRST=False
-        mailgroups={}
+        compile_obj = re.compile(rawstr, re.MULTILINE)
+        STOP_ON_FIRST = True
+        STOP_ON_FIRST = False
+        mailgroups = {}
         for ppath, pfilename, prev in compile_obj.findall(diff_str):
             if '!gateway!' in ppath:
                 mailgroups['ea'] = None
             elif ppath.startswith('ingtest!gwts1000'):
                 mailgroups['ea'] = None
             else:
-                first_two_dirs=ppath.split('!', 2)[:2]
+                first_two_dirs = ppath.split('!', 2)[:2]
                 if first_two_dirs[0] == 'ingres':
                     mailgroups[first_two_dirs[1]] = None
             if STOP_ON_FIRST:
                 break
         
-        mailgroups=list(mailgroups.keys())
+        mailgroups = list(mailgroups.keys())
         mailgroups.sort()
         result = ','.join(mailgroups)
         return result
@@ -455,8 +456,8 @@ These files need integrating:
         """naive guess piccolo branch name
         Uses the path of (only) the first file in the diff, and uses the first 2 directories
         """
-        tmp_line=diff_str.split(' ', 2)[1] # extract path of first file from piccolo diff header
-        first_two_dirs=tmp_line.split('!', 2)[:2]
+        tmp_line = diff_str.split(' ', 2)[1]  # extract path of first file from piccolo diff header
+        first_two_dirs = tmp_line.split('!', 2)[:2]
         if first_two_dirs[0] == 'ingres':
             return first_two_dirs[1]
         else:
@@ -480,10 +481,10 @@ These files need integrating:
 
         """
         rawstr = r"""^>.*(?P<bug_or_sir>(?:SIR\s*|BUG\s*|b))(?P<bug_or_sir_num>\d*)\W"""
-        compile_obj = re.compile(rawstr, re.IGNORECASE| re.MULTILINE)
-        STOP_ON_FIRST=True
-        STOP_ON_FIRST=False
-        bugs_and_sirs={}
+        compile_obj = re.compile(rawstr, re.IGNORECASE | re.MULTILINE)
+        STOP_ON_FIRST = True
+        STOP_ON_FIRST = False
+        bugs_and_sirs = {}
         for change_type, bnum in compile_obj.findall(diff_str):
             #change_type = change_type.upper()
             #if change_type == 'B':
@@ -497,7 +498,7 @@ These files need integrating:
             if STOP_ON_FIRST:
                 break
         
-        bugs_and_sirs_list=list(bugs_and_sirs.keys())
+        bugs_and_sirs_list = list(bugs_and_sirs.keys())
         bugs_and_sirs_list.sort()
         result = ','.join(bugs_and_sirs_list)
         logging.debug("guess bugs: %r" % result)
