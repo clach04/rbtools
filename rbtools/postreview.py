@@ -1215,6 +1215,9 @@ def parse_options(args):
     parser.add_option("-c", "--p2-changenumber",
                       dest="p2changenumber", default=None,
                       help='PICCOLO ONLY: Piccolo (existing) change number, takes an existing change and posts for review')
+    parser.add_option("--p2-binary",
+                      dest="p2_binary", default='p', # not sure if this should just be None
+                      help='PICCOLO ONLY: Piccolo executable/binary name.')
 
 
 

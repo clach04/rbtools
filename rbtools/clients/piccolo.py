@@ -52,7 +52,6 @@ class PiccoloClient(SCMClient):
     def __init__(self, **kwargs):
         super(PiccoloClient, self).__init__(**kwargs)
         # FIXME debug hacks:
-        self.options.p2_binary = None
         self.options.p2_server = None
         self.options.p2_ignore_wneed = None
         self.options.piccolo_flist = None  # []
