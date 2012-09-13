@@ -153,8 +153,9 @@ class PiccoloClient(SCMClient):
             self._p_here_txt = execute(self._command_args + [pic_command_str], ignore_errors=True, extra_ignore_errors=(1,))
             self._p_here_txt = self._p_here_txt.strip()
             
-            # FIXME look at check_gnu_diff() - don't actually need gnu diff under most unix systems BUT do under Windows (mostly likely place for a bad diff exe)
             if sys.platform.startswith('win') or os_plat == 'nt':
+                # don't actually need gnu diff under most unix systems BUT
+                # do under Windows (mostly likely place for a bad diff.exe)
                 check_gnu_diff()
         else:
             self._p_here_txt = 'EDITME_P2_CLIENT_INFO'  # TODO do at least minimum hostname and pwd?
@@ -222,8 +223,9 @@ class PiccoloClient(SCMClient):
 
                 post-review  --server=http://reviewboard.ingres.prv --summary="This is a post-review test by hanal04" --description="Checking current automatic field entry from the command line." --bugs-closed="123456, 98734" --target-groups="admin grp" --target-people="clach04" --submit-as="hanal04 -r 999999"
             """
-            # FIXME file handle leak in non CPython implementions due to missing file.close()
-            diffbytes = open(self.options.diff_filename, 'r').read()  # TODO consider strings instead of bytes? NOTE not using binary as we want to avoid \r values.... This may need further work, this is mostly for win32
+            tmp_f = open(self.options.diff_filename, 'r').read()  # TODO consider strings instead of bytes? NOTE not using binary as we want to avoid \r values.... This may need further work, this is mostly for win32
+            diffbytes = tmp_f.read()
+            tmp_f.close()
             diff_text = diffbytes
         else:
             if self.options.piccolo_flist:
@@ -396,7 +398,7 @@ These files need integrating:
                     if file_addition:
                         #import pdb ; pdb.set_trace()
                         if skip_file_additions:
-                            print 'WARNING ignoring ADD file: %r' % line  # FIXME use log.info()
+                            log.info('WARNING ignoring ADD file: %r', line)
                         else:
                             die("ERROR; Change has a file addition, extracting file addition diffs not implemented. Line\n %r" % line.split())
 
