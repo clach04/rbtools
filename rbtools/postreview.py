@@ -1224,6 +1224,9 @@ def parse_options(args):
     parser.add_option("-l", "--p2-filelist-filename",
                       dest="piccolo_flist", default=None,
                       help='PICCOLO ONLY: file containing list of files in change, e.g. "p working | grep gwpr > list_of_files"')
+    parser.add_option("--p2-server",
+                      dest="p2_server", default=None,
+                      help='PICCOLO ONLY: Piccolo repository server name. Piccolo specific version of --repository-url. TODO consider allowing repository-url if piccolo is specified and then ditch this param.')
 
 
 

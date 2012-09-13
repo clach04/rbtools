@@ -27,6 +27,8 @@ def my_setup_debug():
         logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging.INFO,)
 my_setup_debug()
 
+DEFAULT_PICCOLO_SERVER = 'usilsuxx:1666'
+
 
 class PiccoloClient(SCMClient):
     """A wrapper around the p/p2 Piccolo tool that fetches repository information
@@ -51,8 +53,7 @@ class PiccoloClient(SCMClient):
     
     def __init__(self, **kwargs):
         super(PiccoloClient, self).__init__(**kwargs)
-        # FIXME debug hacks:
-        self.options.p2_server = None
+        #self.options.p2_server = None
     
     def get_repository_info(self):
         my_setup_debug()
@@ -183,12 +184,15 @@ class PiccoloClient(SCMClient):
         
         Can then grep for connect, etc.
         """
-        default_piccolo_server = 'usilsuxx:1666'  # and/or pick up from "p map" filtering for connect(s) (shell approach would be; p map |grep '^connect' | awk '{print $4}') if perform_piccolo_check is True
-        repository_path = self.options.p2_server or default_piccolo_server # Should try and pick this up from client map, really need a new piccolo command list (first) piccolo server
+        # Should try and pick up server info from client map, really need a new piccolo command list (first) piccolo server
+        # and/or pick up from "p map" filtering for connect(s) (shell approach would be; p map |grep '^connect' | awk '{print $4}') if perform_piccolo_check is True
+        repository_path = self.options.p2_server or DEFAULT_PICCOLO_SERVER
         
         if self.options.server is None:
             self.options.server = 'http://reviewboard.ingres.prv'  # should consider overridding _get_server_from_config()
         
+        print 'DEBUG clach04', repository_path
+        print 'DEBUG clach04', self.options.server
         return RepositoryInfo(path=repository_path, supports_changesets=False)
         
     def _p_rcompare_diff(self, files):
