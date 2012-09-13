@@ -1,6 +1,7 @@
 import os
 import re
 import sys
+import string
 import logging
 
 from rbtools.api.errors import APIError
@@ -52,7 +53,6 @@ class PiccoloClient(SCMClient):
         super(PiccoloClient, self).__init__(**kwargs)
         # FIXME debug hacks:
         self.options.p2_binary = None
-        self.options.p2changenumber = None
         self.options.p2_server = None
         self.options.p2_ignore_wneed = None
         self.options.piccolo_flist = None  # []

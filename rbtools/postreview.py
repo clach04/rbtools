@@ -1212,6 +1212,10 @@ def parse_options(args):
     parser.add_option("--close-submitted",
                       dest="close_submitted", action="store_true", default=False,
                       help="close review as submitted")
+    parser.add_option("-c", "--p2-changenumber",
+                      dest="p2changenumber", default=None,
+                      help='PICCOLO ONLY: Piccolo (existing) change number, takes an existing change and posts for review')
+
 
 
     (globals()["options"], args) = parser.parse_args(args)
