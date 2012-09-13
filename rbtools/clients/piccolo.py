@@ -54,6 +54,7 @@ class PiccoloClient(SCMClient):
         self.options.p2_binary = None
         self.options.p2changenumber = None
         self.options.p2_server = None
+        self.options.p2_ignore_wneed = None
         self.options.piccolo_flist = None  # []
     
     def get_repository_info(self):
