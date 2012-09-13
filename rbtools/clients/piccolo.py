@@ -53,7 +53,6 @@ class PiccoloClient(SCMClient):
         super(PiccoloClient, self).__init__(**kwargs)
         # FIXME debug hacks:
         self.options.p2_server = None
-        self.options.piccolo_flist = None  # []
     
     def get_repository_info(self):
         my_setup_debug()

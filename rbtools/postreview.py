@@ -1221,6 +1221,9 @@ def parse_options(args):
     parser.add_option("--p2-ignore-wneed",
                       action="store_true", dest="p2_ignore_wneed", default=False,
                       help='PICCOLO ONLY: do NOT fail if opened files are not at headrevs')
+    parser.add_option("-l", "--p2-filelist-filename",
+                      dest="piccolo_flist", default=None,
+                      help='PICCOLO ONLY: file containing list of files in change, e.g. "p working | grep gwpr > list_of_files"')
 
 
 
