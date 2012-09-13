@@ -1218,6 +1218,10 @@ def parse_options(args):
     parser.add_option("--p2-binary",
                       dest="p2_binary", default='p', # not sure if this should just be None
                       help='PICCOLO ONLY: Piccolo executable/binary name.')
+    parser.add_option("--p2-ignore-wneed",
+                      action="store_true", dest="p2_ignore_wneed", default=False,
+                      help='PICCOLO ONLY: do NOT fail if opened files are not at headrevs')
+
 
 
 

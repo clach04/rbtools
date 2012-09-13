@@ -8,7 +8,7 @@ from rbtools.api.errors import APIError
 from rbtools.clients import SCMClient, RepositoryInfo
 from rbtools.utils.checks import check_gnu_diff, check_install
 from rbtools.utils.filesystem import walk_parents
-from rbtools.utils.process import execute
+from rbtools.utils.process import execute, die
 
 
 # Debugging.  For development...
@@ -53,7 +53,6 @@ class PiccoloClient(SCMClient):
         super(PiccoloClient, self).__init__(**kwargs)
         # FIXME debug hacks:
         self.options.p2_server = None
-        self.options.p2_ignore_wneed = None
         self.options.piccolo_flist = None  # []
     
     def get_repository_info(self):
