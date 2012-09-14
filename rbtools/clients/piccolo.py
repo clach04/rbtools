@@ -474,7 +474,7 @@ These files need integrating:
             > bug 123456    - MATCH
             > bug123456     - MATCH
             > b123456       - MATCH
-            < bug 356789    - do NOT match
+            < bug 356789    - do NOT match (as this is a removal '<' not an addition '>')
             >     /* see CVLower above, Bug 108802 (move!) */ - MATCH
             > **  18-Jan-2011 (clach04)
             > **      Bug 124933, NULL dereference in DAfre_buffer()- MATCH
@@ -510,6 +510,8 @@ These files need integrating:
         """
         Adds options to an OptionParser.
         NOT used in RBTool - artifact from older version :-( Here as a yet-another reminder
+        
+        TODO start to use check_options() too?
         """
         ## TODO move this into base class and offer both file passing and reading the contents and passing into diff()
         ## see http://groups.google.com/group/reviewboard/browse_thread/thread/2c6b6ee44754b6d9
