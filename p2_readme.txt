@@ -1,8 +1,17 @@
-readme for Ingres/Picolo version of ReviewBoard (rbtools) postreview
+readme for Ingres/Vectorwise/Actian/p2/Piccolo version of ReviewBoard (rbtools) postreview
 
 NOTE this postreview supports SVN (code.ingres.com) and Piccolo,
 support for other SCM's has been removed.
 
+Simple usage
+
+If you have a recent 2.x version of Python and received postreview as
+a zip file (e.g. postreview.zip) you may simply call postreview using
+this invocation:
+
+    python postreview.zip --help
+
+This will display help but other commands can be issued (covered later).
 
 NOTE recommended minimum version of piccolo client is 2.2.1alpha
 when used with ReviewBoard (for binary and deleted file improvements

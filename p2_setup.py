@@ -20,7 +20,11 @@ import shutil
 
 from distutils.core import setup
 
-import py2exe
+try:
+    import py2exe
+except ImportError:
+    # either non-Windows or py2exe just not installed
+    py2exe = None
 
 
 # Clean temp Python/Jython files
@@ -38,8 +42,12 @@ print 'nasty copy hack'
 shutil.copy2(os.path.join('rbtools', 'postreview.py'), 'postreview.py')
 
 if len(sys.argv) == 1:
-    print 'defaulting to creating py2exe'
-    sys.argv += ['py2exe']
+    if py2exe:
+        print 'defaulting to creating py2exe'
+        sys.argv += ['py2exe']
+    else:
+        print 'py2exe not available'
+        sys.argv += ['sdist']
 
 # disable optimization- we _may_ need docs strings, specifically "copyright"
 setup(
@@ -64,7 +72,7 @@ setup(
     )
 
 zipfilename = 'distribute_me.zip'
-zipfilelist = ['p2_readme.txt', 'postreview.py', os.path.join('win32bin', 'diff.exe'), os.path.join('win32bin', 'p.exe')] + glob.glob('rbtools/*.py') + glob.glob('rbtools/*/*.py') + glob.glob('simplejson/*') + glob.glob('dist/*')
+zipfilelist = ['p2_readme.txt', '__main__.py', 'postreview.py', os.path.join('win32bin', 'diff.exe'), os.path.join('win32bin', 'p.exe')] + glob.glob('rbtools/*.py') + glob.glob('rbtools/*/*.py') + glob.glob('simplejson/*') + glob.glob('dist/*')
 
 import zipfile
 z = zipfile.ZipFile(zipfilename, 'w')
