@@ -9,6 +9,7 @@ import re
 import sys
 import urllib2
 from optparse import OptionParser
+import datetime
 
 try:
     # setuptools from http://peak.telecommunity.com/
@@ -1460,7 +1461,73 @@ def main():
         # The comma here isn't a typo, but rather suppresses the extra newline
         print diff,
         sys.exit(0)
+    
+    ################################################################
+    ## add template
+    if diff and options.rid is None and options.description is None:
+        options.description = '''For template help and more details see http://inspect.ingres.com/r/32/
 
+Targeted submission date: EDITME_DATE_TO_SUBMIT
+Private Path: EDITME_P2_CLIENT_INFO
+
+Bug Release Notes ( http://wiki.ingres.prv/bin/view/Engineering/ReleaseNotes )
+
+    Format before submission with: !}fmt -w 70  (or gq return in VIM)
+
+    (GATEWAY, QA, DEVELOPMENT, W32 ONLY)
+    Bug release note in form of bug report, not fix report.
+    Bug numbers should not be re-used once a release has been
+    provided to either QA or a customer containing a fix for
+    the original bug number
+    (EDITME_BUGNUM)
+
+Related Service Desk Issues: EDITME 
+Related change numbers: EDITME 
+
+Propagation to Other code-lines:
+
+    Candidate for merging into EDITME_CODELINE(S) after submission into this codeline.
+
+Change Description (Format before submission with !}fmt -w 70  (or gq return in VIM)):
+-----------------------------------------------------------
+EDITME_DESCRIPTION
+-----------------------------------------------------------
+
+New or removed Functions:
+
+    EDITME 
+
+CL Interface changes:
+
+    EDITME 
+
+Documentation Impact:
+
+    EDITME 
+
+Design and documentation Links:
+
+    EDITME 
+
+'''
+        one_day = datetime.timedelta(1)
+        submit_date = datetime.date.today() + 3*one_day
+        options.description = options.description.replace('EDITME_DATE_TO_SUBMIT', str(submit_date))
+        p2_client_info = tool._p_here_txt
+        # TODO extract client name (only), 2nd word
+        options.description = options.description.replace('EDITME_P2_CLIENT_INFO', p2_client_info)
+        
+        ## TODO if guess bug number, could prefill in relnotes section too...
+        ## TODO if guess branch went well and was NOT 'main', could prefill in merge/cross integration section too...
+        
+        OS_USER_ENV = options.username or options.submit_as or os.environ.get('USER') or os.environ.get('USERNAME')
+        if OS_USER_ENV == 'clach04':
+            # clach04 special, save me some typing (being the maintainer has perks).....
+            options.description = options.description.replace(' EDITME ', ' None.')
+            options.description = options.description.replace('    (EDITME_BUGNUM)', '    (EDITME_BUGNUM)\n    None')
+            options.description = options.description.replace('    Candidate for merging into EDITME_CODELINE(S) after submission into this codeline.', '    Candidate for merging into EDITME_CODELINE(S) after submission into this codeline.\n    Not a Candidate for merging into other codeline(s).')
+
+    ################################################################
     # Let's begin.
     server.login()
 
