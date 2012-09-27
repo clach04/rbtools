@@ -84,6 +84,7 @@ from rbtools.api.errors import APIError
 from rbtools.clients import scan_usable_client
 from rbtools.clients.perforce import PerforceClient
 from rbtools.clients.plastic import PlasticClient
+from rbtools.clients.piccolo import PiccoloClient
 from rbtools.utils.filesystem import get_config_value, load_config_files
 from rbtools.utils.process import die
 
@@ -1463,6 +1464,19 @@ def main():
         sys.exit(0)
     
     ################################################################
+    # do not guess piccolo "stuff" if this is an existing review
+    if options.rid is None:
+        if diff and isinstance(tool, PiccoloClient) and options.branch is None:
+            options.branch = tool.guess_branch(diff)
+            #print 'debug', 'options.branch', options.branch
+            #raise SystemExit()
+        
+        if diff and isinstance(tool, PiccoloClient) and options.bugs_closed is None:
+            options.bugs_closed = tool.guess_bugs(diff)
+        
+        if diff and isinstance(tool, PiccoloClient) and not options.p2changenumber and options.target_groups is None:
+            options.target_groups = tool.guess_group(diff)
+    
     ## add template
     if diff and options.rid is None and options.description is None:
         options.description = '''For template help and more details see http://inspect.ingres.com/r/32/
