@@ -1304,6 +1304,16 @@ def parse_options(args):
     if options.debug:
         logging.getLogger().setLevel(logging.DEBUG)
 
+    if options.comment and options.comment_file:
+        sys.stderr.write("The --add-comment and --add-comment-file options"
+                         " are mutually exclusive.\n")
+        sys.exit(1)
+
+    if (options.comment or options.comment_file) and options.rid is None:
+        sys.stderr.write("Adding comments is only valid for existing "
+                         "Review Requests.\n")
+        sys.exit(1)
+
     if options.description and options.description_file:
         sys.stderr.write("The --description and --description-file options "
                          "are mutually exclusive.\n")
@@ -1417,6 +1427,20 @@ def main():
         changenum = tool.get_changenum(args)
     else:
         changenum = None
+
+    if options.comment_file:
+        if os.path.exists(options.comment_file):
+            fp = open(options.comment_file, "r")
+            options.comment = fp.read()
+            fp.close()
+            if not options.comment:
+               sys.stderr.write("The add-comment file %s is empty.\n" %
+                             options.comment_file)
+               sys.exit(1)
+        else:
+            sys.stderr.write("The add-comment file %s does not exist.\n" %
+                             options.comment_file)
+            sys.exit(1)
 
     if options.comment or options.close_submitted:
         diff, parent_diff = None, None
