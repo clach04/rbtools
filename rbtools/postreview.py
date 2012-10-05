@@ -1438,9 +1438,13 @@ def main():
                              options.comment_file)
                sys.exit(1)
         else:
-            sys.stderr.write("The add-comment file %s does not exist.\n" %
-                             options.comment_file)
-            sys.exit(1)
+            if options.comment_file == '-':
+                print 'Enter in comment, EOF to finish.'
+                options.comment = sys.stdin.read()
+            else:
+                sys.stderr.write("The add-comment file %s does not exist.\n" %
+                                 options.comment_file)
+                sys.exit(1)
 
     if options.comment or options.close_submitted:
         diff, parent_diff = None, None
