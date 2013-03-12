@@ -442,7 +442,7 @@ These files need integrating:
                 mailgroups['ea'] = None
             elif ppath.startswith('ingtest!gwts1000'):
                 mailgroups['ea'] = None
-            elif ppath.startswith('ingres!w4er91cp') or ppath.startswith('ingres!w4fs') or ppath.startswith('ingres!w4tag') or ppath.startswith('ingres!w4xml') or ppath.startswith('ingres!w4er92ut') or ppath.startswith('ingres!or60') or ppath.startswith('ingres!w4fpclr') or ppath.startswith('ingres!e1daily'):
+            elif ppath.startswith('ingres!w4er') or ppath.startswith('ingres!w4fs') or ppath.startswith('ingres!w4tag') or ppath.startswith('ingres!w4xml') or ppath.startswith('ingres!or60') or ppath.startswith('ingres!w4fpclr') or ppath.startswith('ingres!e1daily'):
                 mailgroups['openroad'] = None
             else:
                 first_two_dirs = ppath.split('!', 2)[:2]
