@@ -1506,6 +1506,12 @@ def main():
         
         if diff and isinstance(tool, PiccoloClient) and not options.p2changenumber and options.target_groups is None:
             options.target_groups = tool.guess_group(diff)
+    else:
+        # make copy/pasting output from postreview as -r/--review-request-id=
+        # param easier under Windows. Under Unix terminals double clicking
+        # number only selects number in Windows CMD the (hash/pound symbol)
+        # "#" gets selected too.
+        options.rid = options.rid.replace('#', '')
     
     ## add template
     if diff and options.rid is None and options.description is None:
