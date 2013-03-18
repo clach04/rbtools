@@ -1499,7 +1499,10 @@ def main():
             #raise SystemExit()
         
         if diff and isinstance(tool, PiccoloClient) and options.bugs_closed is None:
-            options.bugs_closed = tool.guess_bugs(diff)
+            bugs_list, one_line_summary = tool.guess_bugs(diff)
+            options.bugs_closed = bugs_list
+            if one_line_summary and options.summary is None:
+                options.summary = one_line_summary
         
         if diff and isinstance(tool, PiccoloClient) and not options.p2changenumber and options.target_groups is None:
             options.target_groups = tool.guess_group(diff)

@@ -468,10 +468,20 @@ These files need integrating:
             return '!'.join(first_two_dirs)
         
     def guess_bugs(self, diff_str):
-        """naive guess piccolo bug(s)
+        """naive guess piccolo bug/SIR(s) numbers along with summary
+        
         Uses the bug or sirs found in the (in the additions) diff text.
         Can either use first found or all (default)
-        Looks for bug or sir numbers on NEW (diff) lines, e.g.:
+        Looks for bug or sir numbers on NEW (diff) lines.
+        
+        If the diff is of the form:
+        
+            > **      Bug 126982 - Remove Oracle 10g support from gwuseoraW
+        
+        It will try and extract the bug number "126982" and one line summary,
+        "Remove Oracle 10g support from gwuseoraW"
+        
+        Examples:
         
             > bug 123456    - MATCH
             > bug123456     - MATCH
@@ -484,17 +494,19 @@ These files need integrating:
             > **      (copied from Oracle gateway).
 
         """
-        rawstr = r"""^>.*(?P<bug_or_sir>(?:SIR\s*|BUG\s*|b))(?P<bug_or_sir_num>\d*)\W"""
+        rawstr = r"""^>.*(?P<bug_or_sir>(?:SIR\s*|BUG\s*|b))(?P<bug_or_sir_num>\d*)\W(?:-\W(?P<summary>.*))?"""
         compile_obj = re.compile(rawstr, re.IGNORECASE | re.MULTILINE)
         STOP_ON_FIRST = True
         STOP_ON_FIRST = False
         bugs_and_sirs = {}
-        for change_type, bnum in compile_obj.findall(diff_str):
+        one_line_summary = None
+        for change_type, bnum, summary in compile_obj.findall(diff_str):
             #change_type = change_type.upper()
             #if change_type == 'B':
             #    change_type = 'BUG'
             try:
                 bnum = str(int(bnum))
+                one_line_summary = one_line_summary or summary  # use the first one we find
             except ValueError:
                 # that was not an integer!
                 continue
@@ -506,7 +518,7 @@ These files need integrating:
         bugs_and_sirs_list.sort()
         result = ','.join(bugs_and_sirs_list)
         logging.debug("guess bugs: %r" % result)
-        return result
+        return result, one_line_summary
     
     def add_options(self, parser):
         """
