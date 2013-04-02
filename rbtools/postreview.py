@@ -12,6 +12,11 @@ from optparse import OptionParser
 import datetime
 
 try:
+    from cStringIO import StringIO as FakeFile
+except ImportError:
+    from StringIO import StringIO as FakeFile
+
+try:
     # setuptools from http://peak.telecommunity.com/
     from pkg_resources import parse_version
 except ImportError:
@@ -192,8 +197,18 @@ class ReviewBoardHTTPBasicAuthHandler(urllib2.HTTPBasicAuthHandler):
         if not self._retried:
             self._retried = True
             self.retried = 0
-            response = urllib2.HTTPBasicAuthHandler.retry_http_basic_auth(
-                self, *args, **kwargs)
+            try:
+                response = urllib2.HTTPBasicAuthHandler.retry_http_basic_auth(
+                    self, *args, **kwargs)
+            except ValueError, e:
+                if e.args[0] == "AbstractDigestAuthHandler doesn't know about Basic" and sys.version_info >= (2, 4) and sys.version_info < (2, 5):
+                    # Python 2.4 client and user gave bad username/password
+                    # Hack to log a slightly more useful error message
+                    # See http://code.google.com/p/reviewboard/issues/detail?id=2121
+                    print 'ERROR: Suspect incorrect username and/or password'
+                    fileptr = FakeFile('')
+                    raise urllib2.HTTPError(None, 401, None, None, fileptr)
+                raise
 
             if response.code != 401:
                 self._retried = False
