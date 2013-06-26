@@ -1579,7 +1579,10 @@ Design and documentation Links:
         one_day = datetime.timedelta(1)
         submit_date = datetime.date.today() + 3*one_day
         options.description = options.description.replace('EDITME_DATE_TO_SUBMIT', str(submit_date))
-        p2_client_info = tool._p_here_txt
+        if isinstance(tool, PiccoloClient):
+            p2_client_info = tool._p_here_txt
+        else:
+            p2_client_info = ''
         # TODO extract client name (only), 2nd word
         options.description = options.description.replace('EDITME_P2_CLIENT_INFO', p2_client_info)
         
