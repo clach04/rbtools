@@ -277,6 +277,16 @@ These files need integrating:
             
             diff_text = execute(self._command_args + [pic_command_str], extra_ignore_errors=(1,))
             # Could add extra sanity check; for decent looking output, e.g. starts with '==='
+            if not diff_text.startswith('=== '):
+                """We probably have a problem....
+                For example, the -l filename may not exist, piccolo server down,
+                wrong piccolo path, etc.
+                We need to stop here.
+                
+                We can not raise an APIError() as that is for HTTP errors and
+                does NOT support error text.
+                """
+                raise NotImplementedError('Unhandled Piccolo diff error\n%s' % (diff_text,))
         return (diff_text, None)
     
     def _p_describe_diff(self, files):
