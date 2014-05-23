@@ -190,7 +190,7 @@ class PiccoloClient(SCMClient):
         repository_path = self.options.p2_server or DEFAULT_PICCOLO_SERVER
         
         if self.options.server is None:
-            self.options.server = 'http://reviewboard.ingres.prv'  # should consider overridding _get_server_from_config()
+            self.options.server = 'http://reviewboard.actian.com'  # should consider overridding _get_server_from_config()
         
         logging.debug('repository_path %r', repository_path)
         logging.debug('options.server %r', self.options.server)
@@ -219,9 +219,9 @@ class PiccoloClient(SCMClient):
                 p working | p rcompare -i -l - > example_pic.diff
                 
             Step 2 - post review
-                jython post-review  --p2-diff-filename example_pic.diff --server=http://reviewboard.ingres.prv
+                jython post-review  --p2-diff-filename example_pic.diff --server=http://reviewboard.actian.com
 
-                post-review  --server=http://reviewboard.ingres.prv --summary="This is a post-review test by hanal04" --description="Checking current automatic field entry from the command line." --bugs-closed="123456, 98734" --target-groups="admin grp" --target-people="clach04" --submit-as="hanal04 -r 999999"
+                post-review  --server=http://reviewboard.actian.com --summary="This is a post-review test by hanal04" --description="Checking current automatic field entry from the command line." --bugs-closed="123456, 98734" --target-groups="admin grp" --target-people="clach04" --submit-as="hanal04 -r 999999"
             """
             tmp_f = open(self.options.diff_filename, 'r').read()  # TODO consider strings instead of bytes? NOTE not using binary as we want to avoid \r values.... This may need further work, this is mostly for win32
             diffbytes = tmp_f.read()
