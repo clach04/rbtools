@@ -1506,26 +1506,26 @@ def main():
         sys.exit(0)
     
     ################################################################
-    # do not guess piccolo "stuff" if this is an existing review
-    if options.rid is None:
-        if diff and isinstance(tool, PiccoloClient) and options.branch is None:
-            options.branch = tool.guess_branch(diff)
-            #print 'debug', 'options.branch', options.branch
-            #raise SystemExit()
-        
-        if diff and isinstance(tool, PiccoloClient) and options.bugs_closed is None:
-            bugs_list, one_line_summary = tool.guess_bugs(diff)
-            options.bugs_closed = bugs_list
-            if one_line_summary and options.summary is None:
-                options.summary = one_line_summary
-        
-        if diff and isinstance(tool, PiccoloClient) and not options.p2changenumber and options.target_groups is None:
-            options.target_groups = tool.guess_group(diff)
-    else:
+    if isinstance(tool, PiccoloClient):
+        # do not guess piccolo "stuff" if this is an existing review
+        if options.rid is None:
+            if diff and options.branch is None:
+                options.branch = tool.guess_branch(diff)
+
+            if diff and options.bugs_closed is None:
+                bugs_list, one_line_summary = tool.guess_bugs(diff)
+                options.bugs_closed = bugs_list
+                if one_line_summary and options.summary is None:
+                    options.summary = one_line_summary
+
+            if diff and not options.p2changenumber and options.target_groups is None:
+                options.target_groups = tool.guess_group(diff)
+
+    if options.rid:
         # make copy/pasting output from postreview as -r/--review-request-id=
         # param easier under Windows. Under Unix terminals double clicking
-        # number only selects number in Windows CMD the (hash/pound symbol)
-        # "#" gets selected too.
+        # digits only selects the entire number in Windows CMD the
+        # (hash/pound symbol) "#" gets selected too.
         options.rid = options.rid.replace('#', '')
     
     ## add template
