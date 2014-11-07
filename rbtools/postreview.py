@@ -1295,6 +1295,9 @@ def parse_options(args):
     parser.add_option("--close-submitted",
                       dest="close_submitted", action="store_true", default=False,
                       help="close review as submitted")
+    parser.add_option("--p2-ebcdic-fix-diff",
+                      action="store_true", dest="p2_ebcdic_fix_diff", default=False,
+                      help='PICCOLO ONLY: Convert Mainframe EBCDIC Whitesmith C square brackets "[]" to US-ASCII')
     parser.add_option("-l", "--p2-filelist-filename",
                       dest="piccolo_flist", default=None,
                       help='PICCOLO ONLY: file containing list of files in change, e.g. "p working | grep gwpr > list_of_files"')
@@ -1499,6 +1502,49 @@ def main():
             debug('Using changenums on Review Board %s, which is broken. '
                   'Falling back to the deprecated 1.0 API' % server.rb_version)
             server.deprecated_api = True
+
+    print 'cmc', options.p2_ebcdic_fix_diff
+    print 'cmc', options.p2_ebcdic_fix_diff and diff
+    if options.p2_ebcdic_fix_diff and diff:
+        print 'doing diff'
+        """convert junk bytes into valid ASCII
+        See http://wiki.ingres.prv/bin/view/Engineering/MainframePiccolo
+        The original EBCDIC standard did NOT support the square bracket
+        characters, '[' and ']'. According to http://en.wikipedia.org/wiki/EBCDIC
+        there are versions of EBCDIC that have those characters now:
+
+            EBCDIC 0xba == '[' == U+005B
+            EBCDIC 0xbb == ']' == U+005D
+
+        The Whitesmith compiler we own/use, predates this and uses different
+        characters, on top of this the terminal software we use for transfer
+        files (like diffs) does not handle this (luckily Piccolo does).
+        This piece of code below simple cleans up those two specific
+        characters.
+
+        Downloaded diffs (on Windows client machine) appear to be:
+
+            0xdd == '[' == U+005B
+            0xa8  == ']' == U+005D
+
+        NOTE TODO one other bad character:
+
+            === edbc!edbc23!dcm!gwc dbproc.sql rev 1 ====
+            dbproc.sql X: local file missing - can't diff
+
+        Where X is 0x94 after transfer to client (Windows) machine.
+
+        TODO initial mainframe piccolo version does NOT show (diff) contents
+        of new file additions. We have special code to identify deleted
+        files and to show that in the diff, it would be a good idea (as
+        a stop gap until the diffs are generated correctly) to message
+        that new files have been added.
+        """
+        BAD_LEFT_BRACKET = '\xdd'
+        BAD_RIGHT_BRACKET = '\xa8'
+        diff = diff.replace(BAD_LEFT_BRACKET, '[')
+        diff = diff.replace(BAD_RIGHT_BRACKET, ']')
+        print diff
 
     if options.output_diff_only:
         # The comma here isn't a typo, but rather suppresses the extra newline
