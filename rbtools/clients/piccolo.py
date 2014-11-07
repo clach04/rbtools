@@ -298,7 +298,7 @@ These files need integrating:
         Suggested usage:
         
         Unix
-            env DISABLE_POSTREVIEWPICCOLOCLIENT=true python /export/home/ingres/clach04/scripts/rb_post.py --server=http://clach04-745.ingres.prv:8000 -c 493916
+            env DISABLE_POSTREVIEWPICCOLOCLIENT=true python /export/home/ingres/clach04/scripts/rb_post.py --server=http://myserver:8000 -c 493916
 
         
         TODO merge into PiccoloClient (i.e. remove PiccoloChangeClient) so that if -c flag is present it does changes
