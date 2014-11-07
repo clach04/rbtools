@@ -529,21 +529,3 @@ These files need integrating:
         result = ','.join(bugs_and_sirs_list)
         logging.debug("guess bugs: %r" % result)
         return result, one_line_summary
-    
-    def add_options(self, parser):
-        """
-        Adds options to an OptionParser.
-        NOT used in RBTool - artifact from older version :-( Here as a yet-another reminder
-        
-        TODO start to use check_options() too?
-        """
-        ## TODO move this into base class and offer both file passing and reading the contents and passing into diff()
-        ## see http://groups.google.com/group/reviewboard/browse_thread/thread/2c6b6ee44754b6d9
-        ## this way we know the -l flag will not be used in the future for other options! ;-)
-        parser.add_option("-l", "--filelist_filename",
-                          dest="piccolo_flist", default=None,
-                          help='file containing list of files in change, e.g. "p working | grep gwpr > sc"')
-        
-        parser.add_option("-c", "--changenumber",
-                          dest="changenumber", default=None,
-                          help='Piccolo (existing) change number')
