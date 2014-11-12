@@ -1503,10 +1503,7 @@ def main():
                   'Falling back to the deprecated 1.0 API' % server.rb_version)
             server.deprecated_api = True
 
-    print 'cmc', options.p2_ebcdic_fix_diff
-    print 'cmc', options.p2_ebcdic_fix_diff and diff
     if options.p2_ebcdic_fix_diff and diff:
-        print 'doing diff'
         """convert junk bytes into valid ASCII
         See http://wiki.ingres.prv/bin/view/Engineering/MainframePiccolo
         The original EBCDIC standard did NOT support the square bracket
@@ -1544,7 +1541,6 @@ def main():
         BAD_RIGHT_BRACKET = '\xa8'
         diff = diff.replace(BAD_LEFT_BRACKET, '[')
         diff = diff.replace(BAD_RIGHT_BRACKET, ']')
-        print diff
 
     if options.output_diff_only:
         # The comma here isn't a typo, but rather suppresses the extra newline
