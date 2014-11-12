@@ -31,7 +31,7 @@
 #
 #   (Major, Minor, Micro, alpha/beta/rc/final, Release Number, Released)
 #
-VERSION = (0, 4, 1, 'beta', 4, True)  # rewinding clock until more testing is done of (reimplemented) p2 features
+VERSION = (0, 4, 1, 'beta', 5, True)  # rewinding clock until more testing is done of (reimplemented) p2 features
 
 
 def get_version_string():
