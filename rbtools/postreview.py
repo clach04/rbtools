@@ -1575,6 +1575,7 @@ def main():
         options.description = '''For template help and more details see http://inspect.ingres.com/r/32/
 
 Targeted submission date: EDITME_DATE_TO_SUBMIT
+Number of Approvals required: 2
 Private Path: EDITME_P2_CLIENT_INFO
 
 Bug Release Notes ( http://wiki.ingres.prv/bin/view/Engineering/ReleaseNotes )
@@ -1588,9 +1589,9 @@ Bug Release Notes ( http://wiki.ingres.prv/bin/view/Engineering/ReleaseNotes )
     the original bug number
     (EDITME_BUGNUM)
 
-Related Salesforce Case: EDITME 
-Related Service Desk Issues: EDITME 
-Related change numbers: EDITME 
+Related Salesforce Case(s): EDITME
+Related Jira ticket(s): EDITME
+Related change numbers: EDITME
 
 Propagation to Other code-lines:
 
@@ -1619,8 +1620,13 @@ Design and documentation Links:
 
 '''
         one_day = datetime.timedelta(1)
-        submit_date = datetime.date.today() + 3*one_day
-        options.description = options.description.replace('EDITME_DATE_TO_SUBMIT', str(submit_date))
+        submit_delay = 1
+        submit_date = datetime.datetime.now() + (submit_delay * one_day)
+        utc_offset_min = int(round((datetime.datetime.now() - datetime.datetime.utcnow()).total_seconds())) / 60    # round for taking time twice
+        utc_offset_hour = utc_offset_min / 60
+        assert utc_offset_min == utc_offset_hour * 60, 'Support for sub-hour timeszone offsets needs to be implemented!'
+        submit_date_str = '%s UTC%i (%d day(s) from posting IP)' % (str(submit_date)[:16], utc_offset_hour, submit_delay)
+        options.description = options.description.replace('EDITME_DATE_TO_SUBMIT', submit_date_str)
         if isinstance(tool, PiccoloClient):
             p2_client_info = tool._p_here_txt
         else:
