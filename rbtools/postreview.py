@@ -10,6 +10,7 @@ import sys
 import urllib2
 from optparse import OptionParser
 import datetime
+import time
 
 try:
     from cStringIO import StringIO as FakeFile
@@ -1622,9 +1623,9 @@ Design and documentation Links:
         one_day = datetime.timedelta(1)
         submit_delay = 1
         submit_date = datetime.datetime.now() + (submit_delay * one_day)
-        utc_offset_min = int(round((datetime.datetime.now() - datetime.datetime.utcnow()).total_seconds())) / 60    # round for taking time twice
+        utc_offset_min = time.altzone / 60
         utc_offset_hour = utc_offset_min / 60
-        assert utc_offset_min == utc_offset_hour * 60, 'Support for sub-hour timeszone offsets needs to be implemented!'
+        utc_offset_hour *= -1
         submit_date_str = '%s UTC%i (%d day(s) from posting IP)' % (str(submit_date)[:16], utc_offset_hour, submit_delay)
         options.description = options.description.replace('EDITME_DATE_TO_SUBMIT', submit_date_str)
         if isinstance(tool, PiccoloClient):
