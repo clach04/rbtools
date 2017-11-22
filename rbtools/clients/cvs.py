@@ -117,7 +117,7 @@ class CVSClient(SCMClient):
         }
 
     def diff(self, revisions, include_files=[], exclude_patterns=[],
-             extra_args=[]):
+             no_renames=False, extra_args=[]):
         """Get the diff for the given revisions.
 
         If revision_spec is empty, this will return the diff for the modified

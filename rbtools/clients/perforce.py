@@ -465,7 +465,7 @@ class PerforceClient(SCMClient):
         return None
 
     def diff(self, revisions, include_files=[], exclude_patterns=[],
-             extra_args=[]):
+             no_renames=False, extra_args=[]):
         """
         Goes through the hard work of generating a diff on Perforce in order
         to take into account adds/deletes and to provide the necessary

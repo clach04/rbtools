@@ -257,7 +257,7 @@ class SVNClient(SCMClient):
         return get_url_prop(repository_info.path)
 
     def diff(self, revisions, include_files=[], exclude_patterns=[],
-             extra_args=[]):
+             no_renames=False, extra_args=[]):
         """
         Performs a diff in a Subversion repository.
 

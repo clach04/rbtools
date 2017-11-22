@@ -738,7 +738,7 @@ class ClearCaseClient(SCMClient):
         return changeset
 
     def diff(self, revisions, include_files=[], exclude_patterns=[],
-             extra_args=[]):
+             no_renames=False, extra_args=[]):
         if include_files:
             raise Exception(
                 'The ClearCase backend does not currently support the '

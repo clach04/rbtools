@@ -39,6 +39,7 @@ class SCMClient(object):
 
     supports_diff_extra_args = False
     supports_diff_exclude_patterns = False
+    supports_no_renames = False
     supports_patch_revert = False
 
     can_amend_commit = False
@@ -117,7 +118,7 @@ class SCMClient(object):
         }
 
     def diff(self, revisions, include_files=[], exclude_patterns=[],
-             extra_args=[]):
+             no_renames=False, extra_args=[]):
         """
         Returns the generated diff and optional parent diff for this
         repository.
