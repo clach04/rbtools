@@ -30,6 +30,14 @@ my_setup_debug()
 DEFAULT_PICCOLO_SERVER = 'usilsuxx:1666'
 
 
+try:
+    # Jython only test, consider using a robust check platform module, http://downloads.egenix.com/python/platform.py I think there are others
+    os_plat = os.get_os_type()  # TODO uppercase?
+except AttributeError:
+    os_plat = ''
+
+IS_WIN = sys.platform.startswith('win') or os_plat == 'nt'
+
 class PiccoloClient(SCMClient):
     """A wrapper around the p/p2 Piccolo tool that fetches repository information
     and generates compatible diffs.
@@ -87,17 +95,12 @@ class PiccoloClient(SCMClient):
                 perform_piccolo_check = False
             else:
                 perform_piccolo_check = True
-            
-        try:
-            # Jython only test, consider using a robust check platform module, http://downloads.egenix.com/python/platform.py I think there are others
-            os_plat = os.get_os_type()
-        except AttributeError:
-            os_plat = ''
-        if sys.platform.startswith('win') or os_plat == 'nt':
-            self._command_args = ['cmd', '/C']
+
+        if IS_WIN:
+            self._command_args = ['cmd', '/C']  # %ComSpec%
         else:
             # probably Unix like...
-            self._command_args = ['sh', '-c']
+            self._command_args = ['sh', '-c']  # use Bourne shell for portability
 
         logging.debug("piccolo bin %r" % self.p_bin)
         if perform_piccolo_check:
@@ -110,8 +113,7 @@ class PiccoloClient(SCMClient):
             # so we have a piccolo command in the path
             if not self.p_actualver:
                 # check version of piccolo client .........
-                pic_command_str = '%s version -c' % self.p_bin
-                pver_text = execute(self._command_args + [pic_command_str], ignore_errors=True, extra_ignore_errors=(1,))
+                pver_text = execute([self.p_bin, 'version', '-c'], ignore_errors=True, extra_ignore_errors=(1,))
                 logging.info('pver_text %r', pver_text)
                 if pver_text.startswith('Invalid option:'):
                     logging.debug("piccolo version check returned Invalid option")
@@ -125,7 +127,7 @@ class PiccoloClient(SCMClient):
                 pver = pver_text.rsplit('.')
                 logging.debug("pver %r" % pver)
                 
-                #pver = map(int, pver)  # fails if ther are non-integers :-( E.g. 'Piccolo client version 2.2.0b14'
+                #pver = map(int, pver)  # fails if there are non-integers :-( E.g. 'Piccolo client version 2.2.0b14'
                 comparable_pver = []
                 for tmp_ver in pver:
                     try:
@@ -149,11 +151,10 @@ class PiccoloClient(SCMClient):
                     print 'Piccolo version too old. Found version %s need version %s' % (pver_text, self.p_minver_str)
                     return None
             
-            pic_command_str = '%s here' % self.p_bin
-            self._p_here_txt = execute(self._command_args + [pic_command_str], ignore_errors=True, extra_ignore_errors=(1,))
+            self._p_here_txt = execute([self.p_bin, 'here'], ignore_errors=True, extra_ignore_errors=(1,))
             self._p_here_txt = self._p_here_txt.strip()
             
-            if sys.platform.startswith('win') or os_plat == 'nt':
+            if IS_WIN:
                 # don't actually need gnu diff under most unix systems BUT
                 # do under Windows (mostly likely place for a bad diff.exe)
                 check_gnu_diff()
@@ -235,8 +236,7 @@ class PiccoloClient(SCMClient):
             
             # Naive "check all working files for integration"
             # Ideally would use file list but wneed errors if files are specified
-            pic_command_str = '%s wneed' % (self.p_bin,)
-            integration_text = execute(self._command_args + [pic_command_str], extra_ignore_errors=(1,))
+            integration_text = execute([self.p_bin, 'wneed'], extra_ignore_errors=(1,))
             if integration_text:
                 warn_text = '''
 WARNING opened files are not at headrevs, integration needed before submission.
@@ -255,15 +255,15 @@ These files need integrating:
             # TODO do we need to redirect and capture stderr? "2>&1".
             if self.options.piccolo_flist:
                 self.options.piccolo_flist = os.path.abspath(self.options.piccolo_flist)
-                working_params = '-l %s ' % self.options.piccolo_flist  # TODO do we need to escape the filepath?
+                working_params = '-l "%s" ' % self.options.piccolo_flist
             else:
                 if files:
                     # Just the names specified on command line (and in current directory as Piccolo paths do not match native paths)
-                    working_params = ' '.join(files)
+                    working_params = ' '.join(files)  # TODO handle filenames with spaces?
                 else:
                     # Any open/reserved file will be diff'd
                     working_params = ' '
-            
+
             logging.debug("pre rcompare; self.p_actualver %r" % self.p_actualver)
             #import pdb ; pdb.set_trace()
             if self.p_actualver < [2, 3, 5]:
@@ -274,8 +274,17 @@ These files need integrating:
             pic_command_str = '%s working %s | %s rcompare %s -s -l -' % (self.p_bin, working_params, self.p_bin, pflag_sane_integration_diffs)  # -s for consistent server side diffs, but.....
             pic_command_str = '%s working %s | %s rcompare %s -l -' % (self.p_bin, working_params, self.p_bin, pflag_sane_integration_diffs)  # remove "-s", DEBUG TEST. -s flag to rcompare freaks piccolo out if file is being added
             # be nice if piccolo rcompare supported a new param -working (or similar)
-            
-            diff_text = execute(self._command_args + [pic_command_str], extra_ignore_errors=(1,))
+
+            # NOTE using a pipe in the command string.
+            # Ideally we would use "shell" argument to subprocess.Popen() (execute())
+            # but this code is outside of Piccolo support and set to false.
+            # To minimize diverging from upstream manually do "shell" processing
+            # and rely on native host behaviors
+            if IS_WIN:
+                diff_text = execute(' '.join(self._command_args) + pic_command_str, extra_ignore_errors=(1,))
+            else:
+                diff_text = execute(self._command_args + [pic_command_str], extra_ignore_errors=(1,))
+
             # Could add extra sanity check; for decent looking output, e.g. starts with '==='
             if not diff_text.startswith('=== '):
                 """We probably have a problem....
